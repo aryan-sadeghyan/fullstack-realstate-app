@@ -4,6 +4,12 @@ import { errorHandeler } from "../utils/error.js";
 
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
+  if (!username || !password || !email) {
+    return res.send({
+      success: false,
+      message: "input fields are empty",
+    });
+  }
   const hashedPassword = bcrypt.hashSync(password, 10);
 
   try {
@@ -15,6 +21,6 @@ export const signup = async (req, res, next) => {
       message: "user created successfully",
     });
   } catch (error) {
-    next(errorHandeler(500, "sup im from function"));
+    next(error);
   }
 };

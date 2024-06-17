@@ -1,7 +1,8 @@
 import prisma from "../../prisma/prismaClient.js";
 import bcrypt from "bcrypt";
+import { errorHandeler } from "../utils/error.js";
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
   const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -14,9 +15,6 @@ export const signup = async (req, res) => {
       message: "user created successfully",
     });
   } catch (error) {
-    res.send({
-      success: false,
-      error: error.message,
-    });
+    next(errorHandeler(500, "sup im from function"));
   }
 };

@@ -5,21 +5,26 @@ import jwt from "jsonwebtoken";
 
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
+
   if (!username || !password || !email) {
     return res.send({
       success: false,
       message: "input fields are empty",
     });
   }
-  const hashedPassword = bcrypt.hashSync(password, 10);
-
   try {
-    const info = await prisma.user.create({
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    const user = await prisma.user.create({
       data: { username, email, password: hashedPassword },
     });
+
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+    res.cookie("access_token", token, { httpOnly: true });
     res.send({
       success: true,
       message: "user created successfully",
+      token,
     });
   } catch (error) {
     next(error);

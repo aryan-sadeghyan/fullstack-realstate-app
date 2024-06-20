@@ -1,7 +1,16 @@
 import { FaSearch } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logOut } from "../redux/user/userSlice";
 
 export default function Header() {
+  const dispatch = useDispatch();
+  const handleLogOut = () => {
+    dispatch(logOut(null));
+    localStorage.removeItem("token");
+  };
+  const { currentUser } = useSelector((state) => state.user);
   return (
     <header className='bg-slate-200 shadow-md'>
       <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
@@ -34,9 +43,23 @@ export default function Header() {
               About
             </li>
           </Link>
-          <Link to='/Signin'>
-            <li className='text-slate-700  hover:underline'>Sign in </li>
-          </Link>
+          {currentUser ? (
+            <>
+              {" "}
+              <span>welcom</span>
+              <Link onClick={handleLogOut}>Log out</Link>
+            </>
+          ) : (
+            <>
+              {" "}
+              <Link to='/Signin'>
+                <li className='text-slate-700  hover:underline'>Sign in </li>
+              </Link>
+              <Link to='/Signup'>
+                <li className='text-slate-700  hover:underline'>Sign up </li>
+              </Link>
+            </>
+          )}
         </ul>
       </div>
     </header>

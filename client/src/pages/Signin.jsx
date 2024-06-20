@@ -1,17 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
+import userSlice, {
   signInStart,
   signInSuccess,
   singInFailure,
+  saveToken,
 } from "../redux/user/userSlice";
 
 export default function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
-  const { loading, error } = useSelector((state) => state.user);
+  const { loading, error, token } = useSelector((state) => state.user);
 
   const handleChnage = (e) => {
     setFormData({
@@ -33,12 +34,14 @@ export default function SignIn() {
       });
 
       const data = await res.json();
+      dispatch(saveToken(data.token));
+
       if (data.success === false) {
-        console.log(data);
         dispatch(singInFailure(data.message));
         return;
       }
       dispatch(signInSuccess(data));
+      localStorage.setItem("token", data.token);
       navigate("/");
     } catch (error) {
       dispatch(singInFailure(error.message));

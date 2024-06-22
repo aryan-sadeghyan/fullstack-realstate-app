@@ -5,6 +5,7 @@ import Signin from "./pages/Signin";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
+import PrivateRoute from "./components/PrivateRoute.jsx";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { getLocalToken, setUser } from "./redux/user/userSlice.js";
@@ -46,7 +47,9 @@ export default function App() {
         <Route path='/about' element={<About />} />
         <Route path='/signup' element={<SignUp />} />
         <Route path='/signin' element={<Signin />} />
-        <Route path='/Profile' element={<Profile />} />
+        <Route element={<PrivateRoute />}>
+          <Route path='/Profile' element={<Profile />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -7,6 +7,7 @@ import userSlice, {
   singInFailure,
   saveToken,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 export default function SignIn() {
   const dispatch = useDispatch();
@@ -69,6 +70,7 @@ export default function SignIn() {
         <button className='border rounded-lg bg-slate-700 text-white p-3 uppercase hover:opacity-95 disabled:opacity-80'>
           {loading ? "Loading..." : "SIGN IN"}
         </button>
+        <OAuth />
       </form>
       <div className='flex gap-2 mt-4'>
         <p>dont have an account?</p>

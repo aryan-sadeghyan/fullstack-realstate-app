@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import userRouter from "./routes/user.route.js";
+import cors from "cors";
 
 import authRouter from "./routes/auth.route.js";
 
@@ -9,6 +10,8 @@ const port = 3000;
 const app = express();
 
 app.use(express.json());
+
+app.use(cors());
 
 dotenv.config();
 

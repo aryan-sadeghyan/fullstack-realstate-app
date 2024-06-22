@@ -6,6 +6,7 @@ import {
   signUpSuccess,
   signUpFailure,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 export default function SignUp() {
   const dispatch = useDispatch();
@@ -73,6 +74,7 @@ export default function SignUp() {
         <button className='border rounded-lg bg-slate-700 text-white p-3 uppercase hover:opacity-95 disabled:opacity-80'>
           {loading ? "Loading..." : "SIGN UP"}
         </button>
+        <OAuth />
       </form>
       <div className='flex gap-2 mt-4'>
         <p>already have an account?</p>

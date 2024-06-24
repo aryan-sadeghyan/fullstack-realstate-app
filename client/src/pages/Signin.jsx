@@ -32,7 +32,7 @@ export default function SignIn() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      });
+      });   
 
       const data = await res.json();
       dispatch(saveToken(data.token));
@@ -42,6 +42,7 @@ export default function SignIn() {
         return;
       }
       dispatch(signInSuccess(data));
+
       localStorage.setItem("token", data.token);
       navigate("/");
     } catch (error) {

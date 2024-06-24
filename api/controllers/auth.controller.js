@@ -71,12 +71,14 @@ export const google = async (req, res, next) => {
     });
 
     if (user) {
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+      res.cookie("access_token", token, { httpOnly: true });
       delete user.password;
-      res
-        .cookie("access_token", token, { httpOnly: true })
-        .status(200)
-        .json({ success: true, user });
+      res.send({
+        success: true,
+        user,
+        token,
+      });
     } else {
       const generatedPassword =
         Math.random().toString(36).slice(-8) +
@@ -94,12 +96,14 @@ export const google = async (req, res, next) => {
         },
       });
 
-      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET);
+      res.cookie("access_token", token, { httpOnly: true });
       delete newUser.password;
-      res
-        .cookie("access_token", token, { httpOnly: true })
-        .status(200)
-        .json({ success: true, user: newUser });
+      res.send({
+        success: true,
+        newUser,
+        token,
+      });
     }
   } catch (error) {
     next(error);

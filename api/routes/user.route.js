@@ -1,8 +1,8 @@
 import express from "express";
-import { test } from "../controllers/user.controller.js";
+import { getUserFromToken } from "../controllers/user.controller.js";
 
 const router = express.Router();
 
-router.get("/token", test);
+router.get("/token", getUserFromToken);
 
 export default router;

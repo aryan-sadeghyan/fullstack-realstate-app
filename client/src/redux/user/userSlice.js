@@ -48,6 +48,18 @@ export const userSlice = createSlice({
       state.currentUser = action.payload;
       state.token = action.payload;
     },
+    updateUserFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+    updateUserSuccess: (state, action) => {
+      state.currentUser = action.payload;
+      state.loading = false;
+      state.error = false;
+    },
+    updateUserStart: (state, action) => {
+      state.loading = true;
+    },
   },
 });
 
@@ -62,6 +74,9 @@ export const {
   getLocalToken,
   setUser,
   logOut,
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import prisma from "../../prisma/prismaClient.js";
-import { errorHandeler } from "../utils/error.js";
+import { errorHandler } from "../utils/error.js";
 import bcrypt from "bcrypt";
 export const getUserFromToken = async (req, res) => {
   try {
@@ -37,7 +37,7 @@ export const getUserFromToken = async (req, res) => {
 
 export const updateUser = async (req, res, next) => {
   if (req.user.id !== req.params.id)
-    return next(errorHandeler(401, "not allowd to updated information"));
+    return next(errorHandler(401, "not allowd to updated information"));
   try {
     if (req.body.password) {
       req.body.password = bcrypt.hashSync(req.body.password, 10);

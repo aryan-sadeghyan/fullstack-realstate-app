@@ -9,7 +9,7 @@ import authRouter from "./routes/auth.route.js";
 
 dotenv.config();
 
-const port = process.env.PORT || 3000;
+const port = 3000;
 const app = express();
 
 // Middleware

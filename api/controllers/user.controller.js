@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import prisma from "../../prisma/prismaClient.js";
-
+import { errorHandeler } from "../utils/error.js";
+import bcrypt from "bcrypt";
 export const getUserFromToken = async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
@@ -31,5 +32,28 @@ export const getUserFromToken = async (req, res) => {
   } catch (error) {
     console.error("Error fetching user from token:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+export const updateUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id)
+    return next(errorHandeler(401, "not allowd to updated information"));
+  try {
+    if (req.body.password) {
+      req.body.password = bcrypt.hashSync(req.body.password, 10);
+    }
+    const updatedUser = await prisma.user.update({
+      where: { id: req.params.id },
+      data: {
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+        avatar: req.body.avatar,
+      },
+    });
+    delete updatedUser.password;
+    res.send({ success: true, updatedUser });
+  } catch (error) {
+    next(error);
   }
 };

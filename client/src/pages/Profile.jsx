@@ -12,6 +12,12 @@ import { app } from "../firebase";
 
 import { useDispatch } from "react-redux";
 import {
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  signOutUserFailure,
+  signOutUserStart,
+  signOutUserSuccess,
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
@@ -83,6 +89,40 @@ export default function Profile() {
       dispatch(updateUserFailure(error.message));
     }
   };
+  const handleClick = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+      localStorage.removeItem("token");
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutUserStart());
+      const res = await fetch("/api/user/signout");
+      const data = await res.json();
+
+      if (data.success === false) {
+        dispatch(signOutUserFailure(data.message));
+        return;
+      }
+      dispatch(signOutUserSuccess(data));
+      localStorage.removeItem("token");
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
+    }
+  };
 
   return (
     <div className='p-3 max-w-xl mx-auto'>
@@ -148,8 +188,12 @@ export default function Profile() {
       </form>
       <div className='flex justify-between mt-4 text-red-700'>
         {" "}
-        <span className='cursor-pointer'>Delete Account</span>
-        <span className='cursor-pointer'>Sign Out</span>
+        <span onClick={handleClick} className='cursor-pointer'>
+          Delete Account
+        </span>
+        <span onClick={handleSignOut} className='cursor-pointer'>
+          Sign Out
+        </span>
       </div>
       <p className='text-red-700 mt-5'>{error ? error : ""}</p>
       <p className='text-green-600'>

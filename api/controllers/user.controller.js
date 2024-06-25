@@ -57,3 +57,26 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id)
+    return next(errorHandler(401, "You can only delete your own account!"));
+  try {
+    await prisma.user.delete({
+      where: {
+        id: req.params.id,
+      },
+    });
+    res.clearCookie("access_token");
+    res.status(200).json("User has been deleted!");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const signOut = (req, res, next) => {
+  res.clearCookie("access_token");
+  res.send({
+    success: true,
+    message: "user have been signed out",
+  });
+};

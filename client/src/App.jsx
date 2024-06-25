@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { getLocalToken, setUser } from "./redux/user/userSlice.js";
 import { useEffect } from "react";
+import CreateListing from "./pages/CreateListing.jsx";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -57,6 +58,7 @@ export default function App() {
         <Route path='/signin' element={<Signin />} />
         <Route element={<PrivateRoute />}>
           <Route path='/Profile' element={<Profile />} />
+          <Route path='/create-listing' element={<CreateListing />} />
         </Route>
       </Routes>
     </BrowserRouter>

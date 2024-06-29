@@ -35,19 +35,7 @@ export const userSlice = createSlice({
       state.error = action.payload;
       state.loading = false;
     },
-    saveToken: (state, action) => {
-      state.token = action.payload;
-    },
-    getLocalToken: (state, action) => {
-      state.token = action.payload;
-    },
-    setUser: (state, action) => {
-      state.currentUser = action.payload;
-    },
-    logOut: (state, action) => {
-      state.currentUser = action.payload;
-      state.token = action.payload;
-    },
+
     updateUserFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
@@ -96,10 +84,6 @@ export const {
   signUpStart,
   signUpSuccess,
   signUpFailure,
-  saveToken,
-  getLocalToken,
-  setUser,
-  logOut,
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,

@@ -5,7 +5,6 @@ import userSlice, {
   signInStart,
   signInSuccess,
   singInFailure,
-  saveToken,
 } from "../redux/user/userSlice";
 import OAuth from "../components/OAuth";
 
@@ -13,7 +12,7 @@ export default function SignIn() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
-  const { loading, error, token } = useSelector((state) => state.user);
+  const { loading, error } = useSelector((state) => state.user);
 
   const handleChnage = (e) => {
     setFormData({
@@ -32,18 +31,16 @@ export default function SignIn() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      });   
+      });
 
       const data = await res.json();
-      dispatch(saveToken(data.token));
 
       if (data.success === false) {
         dispatch(singInFailure(data.message));
         return;
       }
-      dispatch(signInSuccess(data));
+      dispatch(signInSuccess(data.user));
 
-      localStorage.setItem("token", data.token);
       navigate("/");
     } catch (error) {
       dispatch(singInFailure(error.message));

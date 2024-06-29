@@ -40,14 +40,14 @@ model Listing {
   description       String  
   address           String  
   regularPrice      Int
-  discountPrice     Int
+  discountPrice     Int?
   bathrooms         Int
   bedrooms          Int
   furnished         Boolean
   parking           Boolean
   type              String
   offer             Boolean
-  imageUrls           String[]
+  imageUrls         String[]
   userRef           String
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

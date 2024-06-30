@@ -16,7 +16,7 @@ export const createListing = async (req, res, next) => {
   }
 };
 
-export const getListing = async (req, res, next) => {
+export const getListings = async (req, res, next) => {
   try {
     const { id } = req.params;
     const userListings = await prisma.listing.findMany({
@@ -63,6 +63,55 @@ export const deleteListing = async (req, res, next) => {
     res.send({
       success: true,
       message: "listing has been deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateListing = async (req, res, next) => {
+  try {
+    const { listingId } = req.params;
+
+    // Check if listingId is provided
+    if (!listingId) {
+      return res.status(400).send({
+        success: false,
+        message: "listingId is required in the URL parameters.",
+      });
+    }
+
+    // Destructure req.body and exclude fields like createdAt, updatedAt, id
+    const { createdAt, updatedAt, id, ...updatedData } = req.body;
+
+    const updatedListing = await prisma.listing.update({
+      where: {
+        id: listingId,
+      },
+      data: {
+        ...updatedData,
+      },
+    });
+
+    res.status(200).send({
+      success: true,
+      updatedListing,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getListing = async (req, res, next) => {
+  try {
+    const listing = await prisma.listing.findUnique({
+      where: {
+        id: req.params.listingId,
+      },
+    });
+    res.send({
+      success: true,
+      listing,
     });
   } catch (error) {
     next(error);

@@ -12,7 +12,8 @@ import PrivateRoute from "./components/PrivateRoute.jsx";
 // import { getLocalToken, setUser } from "./redux/user/userSlice.js";
 // import { useEffect } from "react";
 import CreateListing from "./pages/CreateListing.jsx";
-
+import UpdateListing from "./pages/UpdateListing.jsx";
+import Listing from "./pages/Listing.jsx";
 export default function App() {
   // const dispatch = useDispatch();
   // const { token } = useSelector((state) => state.user);
@@ -56,9 +57,14 @@ export default function App() {
         <Route path='/about' element={<About />} />
         <Route path='/signup' element={<SignUp />} />
         <Route path='/signin' element={<Signin />} />
+        <Route path='/listing/:listingId' element={<Listing />} />
         <Route element={<PrivateRoute />}>
           <Route path='/Profile' element={<Profile />} />
           <Route path='/create-listing' element={<CreateListing />} />
+          <Route
+            path='/update-listing/:listingId'
+            element={<UpdateListing />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

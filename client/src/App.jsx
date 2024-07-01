@@ -5,6 +5,7 @@ import Signin from "./pages/Signin";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import Header from "./components/Header";
+import Search from "./pages/Search.jsx";
 import PrivateRoute from "./components/PrivateRoute.jsx";
 
 // import { useSelector } from "react-redux";
@@ -58,6 +59,7 @@ export default function App() {
         <Route path='/signup' element={<SignUp />} />
         <Route path='/signin' element={<Signin />} />
         <Route path='/listing/:listingId' element={<Listing />} />
+        <Route path='/search' element={<Search />} />
         <Route element={<PrivateRoute />}>
           <Route path='/Profile' element={<Profile />} />
           <Route path='/create-listing' element={<CreateListing />} />

@@ -17,9 +17,10 @@ export default function Search() {
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
   const [showMore, setShowMore] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
+    const urlParams = new URLSearchParams(window.location.search);
     const searchTermFromUrl = urlParams.get("searchTerm");
     const typeFromUrl = urlParams.get("type");
     const parkingFromUrl = urlParams.get("parking");
@@ -40,9 +41,9 @@ export default function Search() {
       setSidebardata({
         searchTerm: searchTermFromUrl || "",
         type: typeFromUrl || "all",
-        parking: parkingFromUrl === "true" ? true : false,
-        furnished: furnishedFromUrl === "true" ? true : false,
-        offer: offerFromUrl === "true" ? true : false,
+        parking: parkingFromUrl === "true",
+        furnished: furnishedFromUrl === "true",
+        offer: offerFromUrl === "true",
         sort: sortFromUrl || "created_at",
         order: orderFromUrl || "desc",
       });
@@ -51,87 +52,85 @@ export default function Search() {
     const fetchListings = async () => {
       setLoading(true);
       setShowMore(false);
+      setError(null);
+
       const searchQuery = urlParams.toString();
-      const res = await fetch(
-        `/api/listing/getsearchedlistings?${searchQuery}`
-      );
-      const data = await res.json();
-      if (data.length > 8) {
-        setShowMore(true);
-      } else {
-        setShowMore(false);
+      try {
+        const res = await fetch(
+          `/api/listing/getsearchedlistings?${searchQuery}`
+        );
+        if (!res.ok) {
+          throw new Error(`Failed to fetch listings: ${res.statusText}`);
+        }
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setListings(data);
+          setShowMore(data.length > 8);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (error) {
+        setError(error.message);
+        setListings([]);
       }
-      setListings(data);
       setLoading(false);
     };
 
     fetchListings();
-  }, [location.search]);
+  }, [window.location.search]);
 
   const handleChange = (e) => {
-    if (
-      e.target.id === "all" ||
-      e.target.id === "rent" ||
-      e.target.id === "sale"
-    ) {
-      setSidebardata({ ...sidebardata, type: e.target.id });
+    const { id, value, checked } = e.target;
+    let newSidebardata = { ...sidebardata };
+
+    if (id === "all" || id === "rent" || id === "sale") {
+      newSidebardata.type = id;
+    } else if (id === "searchTerm") {
+      newSidebardata.searchTerm = value;
+    } else if (id === "parking" || id === "furnished" || id === "offer") {
+      newSidebardata[id] = checked;
+    } else if (id === "sort_order") {
+      const [sort, order] = value.split("_");
+      newSidebardata.sort = sort || "created_at";
+      newSidebardata.order = order || "desc";
     }
 
-    if (e.target.id === "searchTerm") {
-      setSidebardata({ ...sidebardata, searchTerm: e.target.value });
-    }
-
-    if (
-      e.target.id === "parking" ||
-      e.target.id === "furnished" ||
-      e.target.id === "offer"
-    ) {
-      setSidebardata({
-        ...sidebardata,
-        [e.target.id]:
-          e.target.checked || e.target.checked === "true" ? true : false,
-      });
-    }
-
-    if (e.target.id === "sort_order") {
-      const sort = e.target.value.split("_")[0] || "created_at";
-
-      const order = e.target.value.split("_")[1] || "desc";
-
-      setSidebardata({ ...sidebardata, sort, order });
-    }
+    setSidebardata(newSidebardata);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const urlParams = new URLSearchParams();
-    urlParams.set("searchTerm", sidebardata.searchTerm);
-    urlParams.set("type", sidebardata.type);
-    urlParams.set("parking", sidebardata.parking);
-    urlParams.set("furnished", sidebardata.furnished);
-    urlParams.set("offer", sidebardata.offer);
-    urlParams.set("sort", sidebardata.sort);
-    urlParams.set("order", sidebardata.order);
-    const searchQuery = urlParams.toString();
-    navigate(`/search?${searchQuery}`);
+    const urlParams = new URLSearchParams(sidebardata);
+    navigate(`/search?${urlParams.toString()}`);
   };
 
   const onShowMoreClick = async () => {
-    const numberOfListings = listings.length;
-    const startIndex = numberOfListings;
-    const urlParams = new URLSearchParams(location.search);
+    const startIndex = listings.length;
+    const urlParams = new URLSearchParams(window.location.search);
     urlParams.set("startIndex", startIndex);
-    const searchQuery = urlParams.toString();
-    const res = await fetch(`/api/listing/getsearchedlistings?${searchQuery}`);
-    const data = await res.json();
-    if (data.length < 9) {
-      setShowMore(false);
+
+    try {
+      const res = await fetch(
+        `/api/listing/getsearchedlistings?${urlParams.toString()}`
+      );
+      if (!res.ok) {
+        throw new Error(`Failed to fetch more listings: ${res.statusText}`);
+      }
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setListings([...listings, ...data]);
+        setShowMore(data.length > 8);
+      } else {
+        throw new Error("Invalid response format");
+      }
+    } catch (error) {
+      setError(error.message);
     }
-    setListings([...listings, ...data]);
   };
+
   return (
     <div className='flex flex-col md:flex-row'>
-      <div className='p-7  border-b-2 md:border-r-2 md:min-h-screen'>
+      <div className='p-7 border-b-2 md:border-r-2 md:min-h-screen'>
         <form onSubmit={handleSubmit} className='flex flex-col gap-8'>
           <div className='flex items-center gap-2'>
             <label className='whitespace-nowrap font-semibold'>
@@ -216,12 +215,12 @@ export default function Search() {
             <label className='font-semibold'>Sort:</label>
             <select
               onChange={handleChange}
-              defaultValue={"created_at_desc"}
+              value={`${sidebardata.sort}_${sidebardata.order}`}
               id='sort_order'
               className='border rounded-lg p-3'
             >
               <option value='regularPrice_desc'>Price high to low</option>
-              <option value='regularPrice_asc'>Price low to hight</option>
+              <option value='regularPrice_asc'>Price low to high</option>
               <option value='createdAt_desc'>Latest</option>
               <option value='createdAt_asc'>Oldest</option>
             </select>
@@ -236,7 +235,10 @@ export default function Search() {
           Listing results:
         </h1>
         <div className='p-7 flex flex-wrap gap-4'>
-          {!loading && listings.length === 0 && (
+          {error && (
+            <p className='text-xl text-red-700 text-center w-full'>{error}</p>
+          )}
+          {!loading && listings.length === 0 && !error && (
             <p className='text-xl text-slate-700'>No listing found!</p>
           )}
           {loading && (
@@ -244,13 +246,11 @@ export default function Search() {
               Loading...
             </p>
           )}
-
           {!loading &&
             listings &&
             listings.map((listing) => (
               <ListingItem key={listing.id} listing={listing} />
             ))}
-
           {showMore && (
             <button
               onClick={onShowMoreClick}
